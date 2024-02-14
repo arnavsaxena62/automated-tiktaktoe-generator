@@ -2,6 +2,8 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <time.h>
+#include <iomanip>
 using namespace std;
 
 #define gettupple(int, tuple) (get<int>(tuple))
@@ -30,24 +32,24 @@ string checkGameStatus(const string *const *board)
     // Rows and columns
     for (int i = 0; i < 3; ++i)
     {
-        if (board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != "")
+        if (board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != " ")
         {
             return board[i][0];
         }
 
-        if (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != "")
+        if (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != " ")
         {
             return board[0][i];
         }
     }
 
     // Diagonals
-    if (board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != "")
+    if (board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != " ")
     {
         return board[0][0];
     }
 
-    if (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != "")
+    if (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != " ")
     {
         return board[0][2];
     }
@@ -58,7 +60,7 @@ string checkGameStatus(const string *const *board)
     {
         for (int j = 0; j < 3; ++j)
         {
-            if (board[i][j] == "")
+            if (board[i][j] == " ")
             {
                 isDraw = false;
                 break;
@@ -80,7 +82,6 @@ string checkGameStatus(const string *const *board)
 
 string **generateRandomGame()
 {
-    // Dynamically allocate memory for the game board
     string **game = new string *[3];
     for (int i = 0; i < 3; ++i)
     {
@@ -92,7 +93,7 @@ string **generateRandomGame()
     {
         for (int j = 0; j < 3; ++j)
         {
-            game[i][j] = "";
+            game[i][j] = " ";
         }
     }
 
@@ -103,7 +104,7 @@ string **generateRandomGame()
         {
             int adr1 = rand() % 3;
             int adr2 = rand() % 3;
-            if (game[adr1][adr2] == "")
+            if (game[adr1][adr2] == " ")
             {
                 if (turn % 2 == 0)
                 {
@@ -129,7 +130,7 @@ string **generateRandomGame()
             {
                 for (int j = 0; j < 3; ++j)
                 {
-                    if (game[i][j] == "")
+                    if (game[i][j] == " ")
                     {
                         game[i][j] = (rand() % 2 == 0) ? "X" : "O";
                     }
@@ -143,16 +144,37 @@ string **generateRandomGame()
 
 int main()
 {
+    clock_t start, end;
+    start = clock();
     srand(time(NULL));
 
-    for (int i = 0; i < 10; i++)
+    int Xwins = 0;
+    int Owins = 0;
+    int draw = 0;
+    int total = 5000000;
+
+    for (int i = 0; i < total; i++)
     {
 
         string **game = generateRandomGame();
 
-        printGame(game);
+        // printGame(game);
 
-        cout << "-----------" << checkGameStatus(game) << endl;
+        // cout << "----------- " << checkGameStatus(game) << endl;
+
+        string won = checkGameStatus(game);
+        if (won == "X")
+        {
+            Xwins = Xwins + 1;
+        }
+        else if (won == "O")
+        {
+            Owins = Owins + 1;
+        }
+        else if (won == "draw")
+        {
+            draw = draw + 1;
+        }
 
         for (int i = 0; i < 3; ++i)
         {
@@ -160,5 +182,15 @@ int main()
         }
         delete[] game;
     }
+
+    cout << "X %: " << to_string((static_cast<double>(Xwins) / total) * 100) << " %" << endl;
+    cout << "O %: " << to_string((static_cast<double>(Owins) / total) * 100) << " %" << endl;
+    cout << "draw %: " << to_string((static_cast<double>(draw) / total) * 100) << " %" << endl;
+
+    end = clock();
+    double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
+    cout << "Time taken by program is : " << fixed
+         << time_taken << setprecision(5);
+    cout << " sec " << endl;
     return 0;
 }
