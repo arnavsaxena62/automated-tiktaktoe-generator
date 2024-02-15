@@ -5,6 +5,8 @@
 #include <time.h>
 #include <iomanip>
 #include <algorithm>
+#include <bits/stdc++.h>
+
 using namespace std;
 
 #define gettupple(int, tuple) (get<int>(tuple))
@@ -21,12 +23,6 @@ int printGame(string **game)
         cout << endl;
     }
     return 0;
-}
-
-tuple<int, int> strToAddr(string input)
-{
-    char *char_arr = &input[0];
-    return make_tuple(char_arr[0] - '0', char_arr[1] - '0');
 }
 
 string **new_game()
@@ -174,8 +170,26 @@ string **gamearray_to_game(gameturns_array gamearray)
     return game;
 }
 
+gameturns_array printedline_to_gamearray(string str)
+{
+    vector<string> vec;
+    gameturns_array game;
+    stringstream ss(str);
+    string word;
+    while (!ss.eof())
+    {
+        getline(ss, word, ',');
+        vec.push_back(word);
+    }
 
+    for (auto &&i : vec)
+    {
+            char *char_arr = &i[0];
+            game.push_back(make_tuple(char_arr[0] - '0', char_arr[1] - '0'));
+    }
 
+    return game;
+}
 
 int main()
 {
@@ -183,45 +197,58 @@ int main()
     start = clock();
     srand(time(NULL));
 
-    vector<gameturns_array> Xwins;
-    vector<gameturns_array> Owins;
-    vector<gameturns_array> draw;
+    // string input = "21,01,10,20,12,00,02,11,22";
+    // gameturns_array testarray = printedline_to_gamearray(input);
+    // string** game = gamearray_to_game(testarray);
+    // printGame(game);
 
-    for (int i = 0; i < 1000; i++)
-    {
-        gameturns_array game = generateRandomGame();
-        string win = checkGameStatus(gamearray_to_game(game));
+    // vector<gameturns_array> Xwins;
+    // vector<gameturns_array> Owins;
+    // vector<gameturns_array> draw;
 
-        auto existsInVector = [](const gameturns_array &game, const std::vector<gameturns_array> &vec)
-        {
-            return find(vec.begin(), vec.end(), game) != vec.end();
-        };
+    // for (int i = 0; i < 1000; i++)
+    // {
+    //     gameturns_array game = generateRandomGame();
+    //     string win = checkGameStatus(gamearray_to_game(game));
 
-        if (win == "X" && !existsInVector(game, Xwins))
-        {
-            Xwins.push_back(game);
-        }
-        else if (win == "O" && !existsInVector(game, Owins))
-        {
-            Owins.push_back(game);
-        }
-        else if (!existsInVector(game, draw))
-        {
-            draw.push_back(game);
-        } else {
-            i--;
-        }
-    }
+    //     auto existsInVector = [](const gameturns_array &game, const std::vector<gameturns_array> &vec)
+    //     {
+    //         return find(vec.begin(), vec.end(), game) != vec.end();
+    //     };
 
-    for (int i = 0; i < size(Xwins); i++)
-    {
-        for (auto &&j : Xwins[i])
-        {
-            cout<<gettupple(0,j)<<gettupple(1,j)<<",";
-        }
-        cout<<endl;
-    }
-    
+    //     if (win == "X" && !existsInVector(game, Xwins))
+    //     {
+    //         Xwins.push_back(game);
+    //     }
+    //     else if (win == "O" && !existsInVector(game, Owins))
+    //     {
+    //         Owins.push_back(game);
+    //     }
+    //     else if (!existsInVector(game, draw))
+    //     {
+    //         draw.push_back(game);
+    //     } else {
+    //         i--;
+    //     }
+    // }
+
+    // for (int i = 0; i < size(Xwins); i++)
+    // {
+    //     bool firstTuple = true; // Flag to track the first tuple
+    //     for (auto &&j : Xwins[i])
+    //     {
+    //         if (!firstTuple)
+    //         {
+    //             cout << ",";
+    //         }
+    //         else
+    //         {
+    //             firstTuple = false; // Set flag to false after printing the first tuple
+    //         }
+    //         cout << gettupple(0, j) << gettupple(1, j);
+    //     }
+    //     cout << endl;
+    // }
 
     end = clock();
     double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
