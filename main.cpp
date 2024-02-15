@@ -7,6 +7,7 @@
 using namespace std;
 
 #define gettupple(int, tuple) (get<int>(tuple))
+typedef vector<tuple<int, int>> gameturns_array;
 
 int printGame(string **game)
 {
@@ -27,8 +28,28 @@ tuple<int, int> strToAddr(string input)
     return make_tuple(char_arr[0] - '0', char_arr[1] - '0');
 }
 
+string **new_game()
+{
+    string **game = new string *[3];
+    for (int i = 0; i < 3; ++i)
+    {
+        game[i] = new string[3];
+    }
+
+    // Initialize the game board
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            game[i][j] = " ";
+        }
+    }
+    return game;
+}
+
 string checkGameStatus(const string *const *board)
 {
+    string winner;
     // Rows and columns
     for (int i = 0; i < 3; ++i)
     {
@@ -46,12 +67,24 @@ string checkGameStatus(const string *const *board)
     // Diagonals
     if (board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != " ")
     {
-        return board[0][0];
+        winner = board[0][0];
+        for (int i = 0; i < 3; ++i)
+        {
+            delete[] board[i];
+        }
+        delete[] board;
+        return winner;
     }
 
     if (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != " ")
     {
-        return board[0][2];
+        winner = board[0][2];
+        for (int i = 0; i < 3; ++i)
+        {
+            delete[] board[i];
+        }
+        delete[] board;
+        return winner;
     }
 
     // Check draw
@@ -74,29 +107,23 @@ string checkGameStatus(const string *const *board)
 
     if (isDraw)
     {
+        for (int i = 0; i < 3; ++i)
+        {
+            delete[] board[i];
+        }
+        delete[] board;
         return "draw";
     }
+
 
     return "running";
 }
 
-string **generateRandomGame()
+gameturns_array generateRandomGame()
 {
-    string **game = new string *[3];
-    for (int i = 0; i < 3; ++i)
-    {
-        game[i] = new string[3];
-    }
+    gameturns_array gameturns;
 
-    // Initialize the game board
-    for (int i = 0; i < 3; ++i)
-    {
-        for (int j = 0; j < 3; ++j)
-        {
-            game[i][j] = " ";
-        }
-    }
-
+    string **game = new_game();
     // Start the game loop
     for (int turn = 0; turn < 9; turn++)
     {
@@ -114,6 +141,7 @@ string **generateRandomGame()
                 {
                     game[adr1][adr2] = "O";
                 }
+                gameturns.push_back(tuple<int, int>(adr1, adr2));
             }
             else
             {
@@ -124,21 +152,25 @@ string **generateRandomGame()
         {
             break;
         }
-        if (turn == 9 && checkGameStatus(game) == "draw")
-        {
-            for (int i = 0; i < 3; ++i)
-            {
-                for (int j = 0; j < 3; ++j)
-                {
-                    if (game[i][j] == " ")
-                    {
-                        game[i][j] = (rand() % 2 == 0) ? "X" : "O";
-                    }
-                }
-            }
-        }
     }
 
+    return gameturns;
+}
+
+string **gamearray_to_game(gameturns_array gamearray)
+{
+    string **game = new_game();
+    for (int i = 0; i < gamearray.size(); i++)
+    {
+        if (i % 2 == 0)
+        {
+            game[gettupple(0, gamearray[i])][gettupple(1, gamearray[i])] = "X";
+        }
+        else if (i % 2 == 1)
+        {
+            game[gettupple(0, gamearray[i])][gettupple(1, gamearray[i])] = "O";
+        }
+    }
     return game;
 }
 
@@ -151,46 +183,22 @@ int main()
     int Xwins = 0;
     int Owins = 0;
     int draw = 0;
-    int total = 100;
+    int total = 1;
 
     for (int i = 0; i < total; i++)
     {
 
-        string **game = generateRandomGame();
+        gameturns_array test = generateRandomGame();
 
-        // printGame(game);
+        printGame(gamearray_to_game(test));
 
-        // cout << "----------- " << checkGameStatus(game) << endl;
+        cout << "----------- " << checkGameStatus(gamearray_to_game(test)) << endl;
 
-        string won = checkGameStatus(game);
-        if (won == "X")
-        {
-            Xwins = Xwins + 1;
-        }
-        else if (won == "O")
-        {
-            Owins = Owins + 1;
-        }
-        else if (won == "draw")
-        {
-            draw = draw + 1;
-        }
-
-        for (int i = 0; i < 3; ++i)
-        {
-            delete[] game[i];
-        }
-        delete[] game;
+        end = clock();
+        double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
+        cout << "Time taken by program is : " << fixed
+             << time_taken << setprecision(5);
+        cout << " sec " << endl;
+        return 0;
     }
-
-    cout << "X %: " << to_string((static_cast<double>(Xwins) / total) * 100) << " %" << endl;
-    cout << "O %: " << to_string((static_cast<double>(Owins) / total) * 100) << " %" << endl;
-    cout << "draw %: " << to_string((static_cast<double>(draw) / total) * 100) << " %" << endl;
-
-    end = clock();
-    double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
-    cout << "Time taken by program is : " << fixed
-         << time_taken << setprecision(5);
-    cout << " sec " << endl;
-    return 0;
 }
