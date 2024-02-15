@@ -4,6 +4,7 @@
 #include <ctime>
 #include <time.h>
 #include <iomanip>
+#include <algorithm>
 using namespace std;
 
 #define gettupple(int, tuple) (get<int>(tuple))
@@ -115,7 +116,6 @@ string checkGameStatus(const string *const *board)
         return "draw";
     }
 
-
     return "running";
 }
 
@@ -174,31 +174,59 @@ string **gamearray_to_game(gameturns_array gamearray)
     return game;
 }
 
+
+
+
 int main()
 {
     clock_t start, end;
     start = clock();
     srand(time(NULL));
 
-    int Xwins = 0;
-    int Owins = 0;
-    int draw = 0;
-    int total = 1;
+    vector<gameturns_array> Xwins;
+    vector<gameturns_array> Owins;
+    vector<gameturns_array> draw;
 
-    for (int i = 0; i < total; i++)
+    for (int i = 0; i < 1000; i++)
     {
+        gameturns_array game = generateRandomGame();
+        string win = checkGameStatus(gamearray_to_game(game));
 
-        gameturns_array test = generateRandomGame();
+        auto existsInVector = [](const gameturns_array &game, const std::vector<gameturns_array> &vec)
+        {
+            return find(vec.begin(), vec.end(), game) != vec.end();
+        };
 
-        printGame(gamearray_to_game(test));
-
-        cout << "----------- " << checkGameStatus(gamearray_to_game(test)) << endl;
-
-        end = clock();
-        double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
-        cout << "Time taken by program is : " << fixed
-             << time_taken << setprecision(5);
-        cout << " sec " << endl;
-        return 0;
+        if (win == "X" && !existsInVector(game, Xwins))
+        {
+            Xwins.push_back(game);
+        }
+        else if (win == "O" && !existsInVector(game, Owins))
+        {
+            Owins.push_back(game);
+        }
+        else if (!existsInVector(game, draw))
+        {
+            draw.push_back(game);
+        } else {
+            i--;
+        }
     }
+
+    for (int i = 0; i < size(Xwins); i++)
+    {
+        for (auto &&j : Xwins[i])
+        {
+            cout<<gettupple(0,j)<<gettupple(1,j)<<",";
+        }
+        cout<<endl;
+    }
+    
+
+    end = clock();
+    double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
+    cout << "Time taken by program is : " << fixed
+         << time_taken << setprecision(5);
+    cout << " sec " << endl;
+    return 0;
 }
