@@ -151,7 +151,7 @@ int main()
     int Xwins = 0;
     int Owins = 0;
     int draw = 0;
-    int total = 5000000;
+    int total = 100;
 
     for (int i = 0; i < total; i++)
     {
